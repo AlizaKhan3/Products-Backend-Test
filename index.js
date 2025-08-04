@@ -1,14 +1,16 @@
 import express from "express"
 import dotenv from "dotenv"
+import { connetToMongoDB } from "./database/databaseConnection.js"
+import appRoutes from "./routes/appRoutes.js"
+
 const app = express()
+app.use(express.json());
 dotenv.config()
 const PORT = process.env.PORT
 
+connetToMongoDB();
 
-
-
-
-app.use("/products")
+app.use("/products", appRoutes)
 
 
 app.listen(PORT, () => {
