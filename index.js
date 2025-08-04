@@ -3,9 +3,11 @@ import dotenv from "dotenv"
 import { connetToMongoDB } from "./database/databaseConnection.js"
 import appRoutes from "./routes/appRoutes.js"
 
+dotenv.config()
+
 const app = express()
 app.use(express.json());
-dotenv.config()
+
 const PORT = process.env.PORT
 
 connetToMongoDB();

@@ -1,6 +1,7 @@
 import fs from 'fs'
 import path, { dirname } from 'path'
 import { fileURLToPath } from 'url'
+import { Product } from '../models/Product.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
@@ -37,7 +38,8 @@ export const getProductByID = async (id) => {
 
 export const postProduct = async (newProduct) => {
     const products = await getProducts();
-    products.push(newProduct)
+    await Product.create(newProduct)
+    // products.push(newProduct)
     const stringifyData = JSON.stringify(products)
     console.log(stringifyData)
     await fs.promises.writeFile(filePath, stringifyData, "utf-8")

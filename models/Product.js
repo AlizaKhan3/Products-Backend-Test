@@ -4,7 +4,7 @@ const productSchema = new mongoose.Schema({
   title: {
     type: String,
     required: true,
-    unique: true
+    // unique: true
   },
 
   description: {
@@ -18,16 +18,15 @@ const productSchema = new mongoose.Schema({
   },
 
   currency_code: {
+    type: String,
     required: true,
     uppercase: true,
   },
 
   category: {
+    type: String,
     required: true,
   }
-
-
-
-}, {timestamps: true});
+}, { timestamps: true });
 
 export const Product = mongoose.model('product', productSchema)
