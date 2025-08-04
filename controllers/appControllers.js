@@ -1,25 +1,31 @@
-import { v4 as uuidv4 } from 'uuid';
-import { getProductByID, getProducts, postProduct, putProduct } from "../helper/productCRUD.js"
+import { postProduct, putProduct } from "../helper/productCRUD.js"
 import { Product } from '../models/Product.js';
 
 export const getController = async (req, res) => {
-    const products = await getProducts()
-    res.status(200).json({ success: true, message: "Products List", data: products })
+    try {
+        const products = await Product.find();
+        res.status(200).json({ success: true, message: "Products List", data: products })
+    } catch (error) {
+        res.status(500).json({ success: false, message: error.message })
+    }
 }
 
 export const getProductByIDController = async (req, res) => {
     try {
         const id = req.params.id;
-        const product = await getProductByID(id);
-        // const product = Product
-        if (!id) {
-            res.status(404).json({ success: false, message: "please enter ID!" })
-        }
-
-        if (!product) {
+        const findProduct = await Product.findById(id)
+        if (!findProduct) {
             res.status(404).json({ success: false, message: "Incorrect Product ID!" })
         }
-        res.status(200).json({ success: true, message: "Products List", data: product })
+        const findedproduct = {
+            id: findProduct._id,
+            title: findProduct.title,
+            current_price: {
+                value: findProduct.price,
+                currency_code: findProduct.currency_code
+            }
+        }
+        res.status(200).json({ success: true, message: "Products List", data: findedproduct })
 
     } catch (error) {
         res.status(500).json({ success: false, message: error.message })
@@ -31,7 +37,6 @@ export const postController = async (req, res) => {
         const { title, description, category, images, price, currency_code } = req.body
 
         const newProduct = {
-            id: uuidv4(),
             title,
             description,
             category,
@@ -55,11 +60,29 @@ export const postController = async (req, res) => {
 export const putController = async (req, res) => {
     try {
         const id = req.params.id;
-        // const {price, currency_code} = req.body;
         const body = req.body;
-        const updatedProduct = await putProduct(id, body)
 
+        const findProduct = await Product.findById(id)
+
+        if (!findProduct) {
+            return res.status(404).json({
+                success: false,
+                message: "Product not found for the given ID!",
+            });
+        }
+
+        const updatedProduct = {};
+
+        if (body.price) {
+            updatedProduct.price = body.price
+        }
+        if (body.currency_code) {
+            updatedProduct.currency_code = body.currency_code
+        }
+
+        await Product.findByIdAndUpdate(id, updatedProduct)
         res.status(200).json({ success: true, message: "Product edited successfully!", data: updatedProduct })
+
     } catch (error) {
         res.status(500).json({ success: false, message: error.message })
     }
